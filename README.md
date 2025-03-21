@@ -13,3 +13,7 @@ What we did today:
 - We created a base that we could use to actually develop TypeBoy.
 - We will develop the three diferrent types of typing and then figure out which one we want to focus on. We could also just develop three different versions. For now, Jun will develop Type 1, and I will develop Type 2.
 - Next steps: develop the different types of typing, which includes tilesets/tilemaps and the actual code.
+- Type 1: ![image](https://github.com/user-attachments/assets/77018b28-f513-4153-9c7c-a96aabe4dd50)
+- Type 2: ![image](https://github.com/user-attachments/assets/6cc2d236-e969-42ad-b3e1-13f8281a1a74)
+
+
