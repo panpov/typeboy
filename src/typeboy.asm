@@ -17,6 +17,10 @@ def DEFAULT_PALETTE                 equ (%11100100)
 def WINDOW_INIT_X                   equ (7)
 def WINDOW_INIT_Y                   equ (144)
 
+; sprite addresses
+def SPRITE_0_ADDRESS equ            (_OAMRAM)
+def SPRITE_1_ADDRESS equ            (_OAMRAM + sizeof_OAM_ATTRS)
+
 macro DisableLCD
     .wait\@
     ld a, [rLY]
@@ -89,7 +93,11 @@ macro EnableLCD
 endm
 
 macro InitSprites
-    ; pass
+    ; initialize the cursor
+    Copy [SPRITE_0_ADDRESS + OAMA_X], 8
+    Copy [SPRITE_0_ADDRESS + OAMA_Y], 16
+    Copy [SPRITE_0_ADDRESS + OAMA_TILEID], SPRITE_0_ADDRESS
+    Copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 endm
 
 section "header", rom0[$0100]
@@ -114,6 +122,7 @@ main:
     .game_loop
         AddBetter [TIMER], 1
         
+        WriteTile $9800, $80
         WriteTile $9905, $80
         WriteTile $9906, $99
 
