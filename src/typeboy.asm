@@ -113,6 +113,9 @@ main:
 
     .game_loop
         AddBetter [TIMER], 1
+        
+        WriteTile $9905, $80
+        WriteTile $9906, $99
 
         halt
         

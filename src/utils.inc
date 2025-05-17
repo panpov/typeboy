@@ -25,6 +25,14 @@ macro AddBetter
     ld \1, a
 endm
 
+; write in bg index \1 the tile index \2
+; \1: $9906, \2: $93 -- this writes tile $93 ('T') in bg index $9906
+; 'A' ($80) - 'Z' ($99)
+macro WriteTile
+    ld a, \2
+    ld [\1], a
+endm
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 rsset _RAM ; $C000
