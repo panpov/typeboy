@@ -1,13 +1,15 @@
 .PHONY: all
 
-all: typeboy.gb clean
+all: main.gb clean
 
-typeboy.gb: typeboy.o
-	rgblink --dmg --tiny --map typeboy.map --sym typeboy.sym -o typeboy.gb typeboy.o
-	rgbfix -v -p 0xFF typeboy.gb
+main.gb: main.o
+	rgblink --dmg --tiny --map main.map --sym main.sym -o main.gb main.o
+	rgbfix -v -p 0xFF main.gb
 
-typeboy.o: src/typeboy.asm src/hardware.inc src/utils.inc
-	rgbasm -o typeboy.o src/typeboy.asm
+main.o: src/main.asm src/type1.asm src/type2.asm src/hardware.inc src/utils.inc
+	rgbasm -o main.o src/main.asm
+	rgbasm -o type1.o src/type1.asm
+	rgbasm -o type2.o src/type2.asm
 
 clean:
 	rm *.sym *.o *.map
