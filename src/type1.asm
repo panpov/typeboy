@@ -1,5 +1,5 @@
 include "src/utils.inc"
-section "one_type", rom0
+section "type1", rom0
 
 type1:
     ld a, [JOYPAD_PRESSED_ADDRESS]

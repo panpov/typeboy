@@ -1,1 +1,1 @@
-section "two_type", rom0
+section "type2", rom0
