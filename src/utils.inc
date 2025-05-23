@@ -7,8 +7,33 @@ include "src/hardware.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-rsset $C010
-def TIMER   rb 1
+rsset _RAM ; $C000
+def JOYPAD_CURRENT_ADDRESS          rb 1
+def JOYPAD_PREVIOUS_ADDRESS         rb 1
+def JOYPAD_PRESSED_ADDRESS          rb 1
+def JOYPAD_RELEASED_ADDRESS         rb 1
+def TIMER                           rb 1
+
+def TILES_COUNT                     equ (384)
+def BYTES_PER_TILE                  equ (16)
+def TILES_BYTE_SIZE                 equ (TILES_COUNT * BYTES_PER_TILE)
+
+def TILEMAPS_COUNT                  equ (1)
+def BYTES_PER_TILEMAP               equ (1024)
+def TILEMAPS_BYTE_SIZE              equ (TILEMAPS_COUNT * BYTES_PER_TILEMAP)
+
+def GRAPHICS_DATA_SIZE              equ (TILES_BYTE_SIZE + TILEMAPS_BYTE_SIZE)
+def GRAPHICS_DATA_END               equ ($4000)
+def GRAPHICS_DATA_START             equ (GRAPHICS_DATA_END - GRAPHICS_DATA_SIZE)
+
+def DEFAULT_PALETTE                 equ (%11100100)
+def WINDOW_INIT_X                   equ (7)
+def WINDOW_INIT_Y                   equ (144)
+
+; sprite addresses
+def SPRITE_0_ADDRESS                equ (_OAMRAM)
+def SPRITE_1_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS)
+
 
 ; copy \2 into \1 through (a)
 ; example: Copy [$FF84], 10
@@ -35,14 +60,7 @@ endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-rsset _RAM ; $C000
-def JOYPAD_CURRENT_ADDRESS  rb 1
-def JOYPAD_PREVIOUS_ADDRESS rb 1
-def JOYPAD_PRESSED_ADDRESS  rb 1
-def JOYPAD_RELEASED_ADDRESS rb 1
-
 macro UpdateJoypad
-
     ld a, [JOYPAD_CURRENT_ADDRESS]
     ld [JOYPAD_PREVIOUS_ADDRESS], a
     ld c, a ; (c) contains previous joypad
@@ -108,7 +126,87 @@ macro UpdateJoypad
 
     ld a, P1F_GET_NONE
     ld [rP1], a
+endm
 
+; INITIALIZATION
+
+macro DisableLCD
+    .wait\@
+    ld a, [rLY]
+    cp a, SCRN_Y
+    jr nz, .wait\@
+
+    xor a
+    ld [rLCDC], a
+endm
+
+macro InitOAM
+    ld c, OAM_COUNT
+    ld hl, _OAMRAM + OAMA_Y
+    ld de, sizeof_OAM_ATTRS
+    
+    .init\@
+    ld [hl], 0
+    add hl, de
+    dec c
+    jr nz, .init\@
+endm
+
+macro InitJoypad
+    ld a, $FF
+    ld [JOYPAD_CURRENT_ADDRESS], a
+    ld [JOYPAD_PREVIOUS_ADDRESS], a
+    ld [JOYPAD_PRESSED_ADDRESS], a
+    ld [JOYPAD_RELEASED_ADDRESS], a
+endm
+
+macro LoadGraphicsIntoVRAM
+    ld de, GRAPHICS_DATA_START
+    ld hl, _VRAM8000
+    
+    .load\@
+    ld a, [de]
+    inc de
+    ld [hli], a
+    ld a, d
+    cp a, high(GRAPHICS_DATA_END)
+    jr nz, .load\@
+endm
+
+macro InitGraphics
+    ld a, DEFAULT_PALETTE    
+    ld [rBGP], a
+    ld [rOBP0], a
+    xor $FF
+    ld [rOBP1], a  
+
+    LoadGraphicsIntoVRAM
+    ld a, IEF_VBLANK
+    ld [rIE], a
+    ei
+
+    ; window hidden
+    ld a, WINDOW_INIT_X
+    ld [rWX], a
+    ld a, WINDOW_INIT_Y
+    ld [rWY], a
+
+    xor a
+    ld [rSCX], a
+    ld [rSCY], a
+endm
+
+macro EnableLCD
+    ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG9800 | LCDCF_OBJ8 | LCDCF_OBJON | LCDCF_BGON
+    ld [rLCDC], a
+endm
+
+macro InitSprites
+    ; initialize the cursor
+    Copy [SPRITE_0_ADDRESS + OAMA_X], 8
+    Copy [SPRITE_0_ADDRESS + OAMA_Y], 16
+    Copy [SPRITE_0_ADDRESS + OAMA_TILEID], SPRITE_0_ADDRESS
+    Copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 endm
 
 endc
