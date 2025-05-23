@@ -13,6 +13,7 @@ def JOYPAD_PREVIOUS_ADDRESS         rb 1
 def JOYPAD_PRESSED_ADDRESS          rb 1
 def JOYPAD_RELEASED_ADDRESS         rb 1
 def TIMER                           rb 1
+def CURR_CHARACTER                  rb 1  
 
 def TILES_COUNT                     equ (384)
 def BYTES_PER_TILE                  equ (16)
@@ -205,7 +206,7 @@ macro InitSprites
     ; initialize the cursor
     Copy [SPRITE_0_ADDRESS + OAMA_X], 8
     Copy [SPRITE_0_ADDRESS + OAMA_Y], 16
-    Copy [SPRITE_0_ADDRESS + OAMA_TILEID], SPRITE_0_ADDRESS
+    Copy [SPRITE_0_ADDRESS + OAMA_TILEID], $01
     Copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 endm
 

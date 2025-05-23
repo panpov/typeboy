@@ -20,15 +20,18 @@ main:
     xor a
     ld [TIMER], a
 
+    ; write "AZ"
+    WriteTile $9800, $80
+    WriteTile $9905, $80
+    WriteTile $9906, $99
+
     .game_loop
+        halt
         AddBetter [TIMER], 1
         
-        WriteTile $9800, $80
-        WriteTile $9905, $80
-        WriteTile $9906, $99
+        ; call type1
+        ; call type2
 
-        halt
-        
         jr .game_loop
 
 section "vblank_interrupt", rom0[$0040]
