@@ -1,0 +1,1 @@
+section "two_type", rom0

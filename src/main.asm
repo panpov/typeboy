@@ -1,5 +1,7 @@
 include "src/hardware.inc"
 include "src/utils.inc"
+include "src/type1.asm"
+include "src/type2.asm"
 
 section "header", rom0[$0100]
 entrypoint:
