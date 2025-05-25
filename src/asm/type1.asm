@@ -1,4 +1,4 @@
-include "src/utils.inc"
+include "src/inc/utils.inc"
 section "type1", rom0
 
 ; init window position

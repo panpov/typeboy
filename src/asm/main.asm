@@ -1,5 +1,7 @@
-include "src/hardware.inc"
-include "src/utils.inc"
+include "src/inc/utils.inc"
+
+section "vblank_interrupt", rom0[$0040]
+    reti
 
 section "header", rom0[$0100]
 entrypoint:
@@ -13,7 +15,6 @@ main:
     InitOAM
     InitJoypad
     InitGraphics
-    InitSprites
     EnableLCD
 
     ; set up WRAM variables
@@ -27,13 +28,11 @@ main:
         UpdateJoypad
         halt
         AddBetter [TIMER], 1
+        
         call type1
         ; call type2
 
         jr .game_loop
-
-section "vblank_interrupt", rom0[$0040]
-    reti
 
 section "graphics_data", rom0[GRAPHICS_DATA_START]
 incbin "assets/tileset.chr"
