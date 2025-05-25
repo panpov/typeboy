@@ -20,16 +20,14 @@ main:
     xor a
     ld [TIMER], a
 
-    ; write "AZ"
-    WriteTile $9800, $80
-    WriteTile $9905, $80
-    WriteTile $9906, $99
+    halt
+    call init_type1
 
     .game_loop
+        UpdateJoypad
         halt
         AddBetter [TIMER], 1
-        
-        ; call type1
+        call type1
         ; call type2
 
         jr .game_loop
