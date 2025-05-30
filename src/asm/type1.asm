@@ -83,8 +83,8 @@ type1:
     ret
 
 check_next_character:
-    ;; using JOYPAD_CURRENT_ADDRESS will be used instead to check if button held
-    ld a, [JOYPAD_PRESSED_ADDRESS]
+    ;; using PADA_CURR will be used instead to check if button held
+    ld a, [PADA_PRESSED]
     and PADF_RIGHT
     jr nz, .right_not_pressed
 
@@ -97,8 +97,8 @@ check_next_character:
     ret
 
 check_prev_character:
-    ;; using JOYPAD_CURRENT_ADDRESS will be used instead to check if button held
-    ld a, [JOYPAD_PRESSED_ADDRESS]
+    ;; using PADA_CURR will be used instead to check if button held
+    ld a, [PADA_PRESSED]
     and PADF_LEFT
     jr nz, .left_not_pressed
 

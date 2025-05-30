@@ -4,25 +4,25 @@ def JOYPAD_INC equ 1
 include "src/inc/hardware.inc"
 
 rsset _RAM ; $C000
-def JOYPAD_CURRENT_ADDRESS          rb 1
-def JOYPAD_PREVIOUS_ADDRESS         rb 1
-def JOYPAD_PRESSED_ADDRESS          rb 1
-def JOYPAD_RELEASED_ADDRESS         rb 1
+def PADA_CURR           rb 1
+def PADA_PREV           rb 1
+def PADA_PRESSED        rb 1
+def PADA_RELEASED       rb 1
 
 ; joypad
 macro InitJoypad
     ld a, $FF
-    ld [JOYPAD_CURRENT_ADDRESS], a
-    ld [JOYPAD_PREVIOUS_ADDRESS], a
-    ld [JOYPAD_PRESSED_ADDRESS], a
-    ld [JOYPAD_RELEASED_ADDRESS], a
+    ld [PADA_CURR], a
+    ld [PADA_PREV], a
+    ld [PADA_PRESSED], a
+    ld [PADA_RELEASED], a
 endm
 
 ; from FA24 CPSCI-240
 ; will probably need to rework
 macro UpdateJoypad
-    ld a, [JOYPAD_CURRENT_ADDRESS]
-    ld [JOYPAD_PREVIOUS_ADDRESS], a
+    ld a, [PADA_CURR]
+    ld [PADA_PREV], a
     ld c, a ; (c) contains previous joypad
 
     ld a, P1F_GET_BTN ; that's %00010000
@@ -57,7 +57,7 @@ macro UpdateJoypad
     or a, b
 
     ; store in our custom joypad byte
-    ld [JOYPAD_CURRENT_ADDRESS], a
+    ld [PADA_CURR], a
     ld b, a ; (b) contains current joypad byte
 
     ; update pressed
@@ -70,7 +70,7 @@ macro UpdateJoypad
     
     ; now any that were previous held or currently not held are 1's
     ; and all presses are 0's
-    ld [JOYPAD_PRESSED_ADDRESS], a
+    ld [PADA_PRESSED], a
 
     ; update released
     ; for each bit, if 0 before, and 1 now, then it was released
@@ -82,7 +82,7 @@ macro UpdateJoypad
 
     ; now any that were previous not hold and current hold are 1's
     ; and all releases are 0's
-    ld [JOYPAD_RELEASED_ADDRESS], a
+    ld [PADA_RELEASED], a
 
     ld a, P1F_GET_NONE
     ld [rP1], a
