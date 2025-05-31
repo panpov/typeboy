@@ -24,19 +24,46 @@ main:
     ; set up WRAM variables
     xor a
     ld [TIMER], a
+    ld [CURR_TYPE], a
 
     ; for proper sprite initialization
     halt
 
-    ; selection sprite
+    ; cursor sprite
     Copy [SPR0 + OAMA_X], INIT_X
     Copy [SPR0 + OAMA_Y], TYPE1_Y
-    Copy [SPR0 + OAMA_TILEID], CURSOR_TILEID
+    Copy [SPR0 + OAMA_TILEID], CURSOR_TID
     Copy [SPR0 + OAMA_FLAGS], OAMF_PAL0
+    jp .start_screen
+
+    .type1_init
+        call init_type1
+
+    .type1_loop
+        UpdateJoypad
+        AddBetter [TIMER], 1
+        WriteTile $9800, $B1
+
+        halt
+        call type1
+
+        jr .type1_loop
+    
+    .type2_init
+        ld de, $24
+    
+    .type2_loop
+        UpdateJoypad
+        AddBetter [TIMER], 1
+        WriteTile $9800, $B2
+        
+        halt
+        call type2
+
+        jr .type2_loop
 
     .start_screen
         UpdateJoypad
-        
         AddBetter [TIMER], 1
 
         halt
@@ -45,16 +72,31 @@ main:
         jr nz, .start_screen
 
         call move_selection
+        call confirm_selection
 
-        jr .start_screen
+        ; COULD make this into a function
+        ; skip next section if no selection has been made
+        ; -----------------------------------------------
+        ld a, [CURR_TYPE]
+        cp a, 0
+        jr z, .start_screen
 
-    .type1_loop
+        ; hide cursor and update background
+        Copy [SPR0 + OAMA_TILEID], EMPTY_TID
+        DisableLCD
+        UpdateTilemap BACKGROUND, _SCRN0
+        EnableLCD
 
-        jr .type1_loop
-    
-    .type2_loop
+        ; jump to loop of selected type
+        ld a, [CURR_TYPE]
+        cp a, TYPE1_ID
+        jp nz, .type2_init
 
-        jr .type1_loop
+        ; switch to type 1 loop
+        jp .type1_init
+        ; -----------------------------------------------
+
+        jp .start_screen
 
 move_selection:
     ; check if up pressed
@@ -86,11 +128,37 @@ move_selection:
     .down_unpressed
     ret
 
-; in progress
 confirm_selection:
+    ; check if start pressed
+    ld a, [PADA_CURR]
+    and PADF_START
+    jr nz, .start_unpressed
 
+    ConfirmSelectionSound
+
+    ; check if type 1 selected
+    ld a, [SPR0 + OAMA_Y]
+    cp a, TYPE1_Y
+    jr nz, .type2_selected
+
+    ; type1_selected
+    Copy [CURR_TYPE], TYPE1_ID
+    jr .start_unpressed
+    .type2_selected
+    
+    ; type2_selected
+    Copy [CURR_TYPE], TYPE2_ID
+    .start_unpressed
     ret
 
 section "graphics_data", rom0[GRAPHICS_DATA_START]
 incbin "assets/tileset.chr"
-incbin "assets/background.tlm"
+
+START_SCREEN:
+    incbin "assets/start_screen.tlm"
+
+WINDOW:
+    incbin "assets/window.tlm"
+
+BACKGROUND:
+    incbin "assets/background.tlm"

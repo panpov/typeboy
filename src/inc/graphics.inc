@@ -8,7 +8,7 @@ def TILES_COUNT                     equ (384)
 def BYTES_PER_TILE                  equ (16)
 def TILES_BYTE_SIZE                 equ (TILES_COUNT * BYTES_PER_TILE)
 
-def TILEMAPS_COUNT                  equ (1)
+def TILEMAPS_COUNT                  equ (3)
 def BYTES_PER_TILEMAP               equ (1024)
 def TILEMAPS_BYTE_SIZE              equ (TILEMAPS_COUNT * BYTES_PER_TILEMAP)
 
@@ -18,9 +18,9 @@ def GRAPHICS_DATA_START             equ (GRAPHICS_DATA_END - GRAPHICS_DATA_SIZE)
 
 macro DisableLCD
     .wait\@
-    ld a, [rLY]
-    cp a, SCRN_Y
-    jr nz, .wait\@
+        ld a, [rLY]
+        cp a, SCRN_Y
+        jr nz, .wait\@
 
     xor a
     ld [rLCDC], a
@@ -32,10 +32,10 @@ macro InitOAM
     ld de, sizeof_OAM_ATTRS
     
     .init\@
-    ld [hl], 0
-    add hl, de
-    dec c
-    jr nz, .init\@
+        ld [hl], 0
+        add hl, de
+        dec c
+        jr nz, .init\@
 endm
 
 macro LoadGraphicsIntoVRAM
@@ -43,12 +43,25 @@ macro LoadGraphicsIntoVRAM
     ld hl, _VRAM8000
     
     .load\@
-    ld a, [de]
-    inc de
-    ld [hli], a
-    ld a, d
-    cp a, high(GRAPHICS_DATA_END)
-    jr nz, .load\@
+        ld a, [de]
+        inc de
+        ld [hli], a
+        ld a, d
+        cp a, high(GRAPHICS_DATA_END)
+        jr nz, .load\@
+endm
+
+; load tilemap at \1 in ROM into \2 in VRAM
+macro UpdateTilemap
+    ld de, \1
+    ld hl, \2
+    .load_tile\@
+        ld a, [de]
+        inc de
+        ld [hli], a
+        ld a, d
+        cp a, high(GRAPHICS_DATA_END)
+        jr nz, .load_tile\@
 endm
 
 macro InitGraphics

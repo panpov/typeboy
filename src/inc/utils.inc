@@ -8,6 +8,7 @@ include "src/inc/joypad.inc"
 
 rsset $C004 ; after joypad addresses
 def TIMER                           rb 1
+def CURR_TYPE                       rb 1
 def CURR_CHARACTER                  rb 1  
 
 def TICK_RATE                       equ (%00000111)
@@ -17,12 +18,17 @@ def WY_INIT                         equ (144)
 def SCX_INIT                        equ (0)
 def SCY_INIT                        equ (0)
 
+; in [CURR_TYPE]
+def TYPE1_ID                        equ (1)
+def TYPE2_ID                        equ (2)
+
 ; start screen
-def CURSOR_TILEID                   equ (1)
+def EMPTY_TID                       equ (2)
+def CURSOR_TID                      equ (1)
 def INIT_X                          equ (56)
 def TYPE1_Y                         equ (88)
 def TYPE2_Y                         equ (104)
-def SEL_DIST                       equ (16)
+def SEL_DIST                        equ (16)
 
 ; sprite addresses
 def SPR0                            equ (_OAMRAM)
